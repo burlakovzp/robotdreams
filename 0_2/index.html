@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ДЗ №0.2 / Знайомство з JavaScript ч.2</title>
+</head>
+
+<body>
+    <script>
+        const isRevertible = x => {
+            if (typeof x === 'number') {
+                return x.toString().split('').reverse().join('') === x.toString();
+            }
+            return false;
+        }
+
+        // Examples from the task
+        console.log(isRevertible(121)); // true
+        console.log(isRevertible(-123)); // false
+
+        // Additional examples
+        console.log(isRevertible(1324)); // false
+        console.log(isRevertible(14641)); // true
+    </script>
+</body>
+
+</html>

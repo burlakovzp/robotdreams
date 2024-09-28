@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ДЗ №0.4 / Асинхронність ч.2</title>
+</head>
+
+<body>
+    <script>
+        const value = 5;
+        
+        const double = (value) => {
+            console.log('double', value); // 5
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(value * 2);
+                }, 1000);
+            });
+        }
+
+        const addTen = (value) => {
+            console.log('addTen', value);  // 10
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(value + 10);
+                }, 1000);
+            });
+        }
+
+        double(value)
+            .then(addTen)
+            .then((result) => {
+                console.log('result', result); // 20
+            });
+    </script>
+</body>
+
+</html>
