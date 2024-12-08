@@ -74,4 +74,36 @@ export class AuthService {
 
     return await this.tokenRepository.save(token);
   }
+
+  async refresh(data: TokenEntity): Promise<TokenEntity> {
+    const { refresh_token } = data;
+
+    if (!refresh_token) {
+      throw new HttpException('Invalid data', HttpStatus.BAD_REQUEST);
+    }
+
+    const token = await this.findRefreshToken(refresh_token);
+
+    if (!token) {
+      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
+    }
+
+    const user = await this.usersService.findOne(token.user_id);
+
+    if (!user) {
+      throw new HttpException('Invalid user', HttpStatus.UNAUTHORIZED);
+    }
+
+    const accessToken = this.jwtService.sign(user, {
+      expiresIn: '3h',
+      secret: process.env.JWT_SECRET,
+    });
+
+    const newRefreshToken = this.jwtService.sign(user, {
+      expiresIn: '7d',
+      secret: process.env.JWT_SECRET,
+    });
+
+    return await this.saveTokens(user.id, accessToken, newRefreshToken);
+  }
 }

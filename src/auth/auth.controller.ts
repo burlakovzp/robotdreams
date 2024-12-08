@@ -11,4 +11,9 @@ export class AuthController {
   async login(@Body() data: UserEntity): Promise<TokenEntity> {
     return this.authService.login(data);
   }
+
+  @Post('refresh')
+  async refresh(@Body() data: TokenEntity): Promise<TokenEntity> {
+    return this.authService.refresh(data);
+  }
 }
