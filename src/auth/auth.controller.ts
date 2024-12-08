@@ -2,6 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { UserEntity } from '../users/user.entity';
 import { AuthService } from './auth.service';
 import { TokenEntity } from './token.entity';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -12,6 +13,7 @@ export class AuthController {
     return this.authService.login(data);
   }
 
+  @ApiBody({ type: TokenEntity })
   @Post('refresh')
   async refresh(@Body() data: TokenEntity): Promise<TokenEntity> {
     return this.authService.refresh(data);

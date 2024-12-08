@@ -75,14 +75,10 @@ export class AuthService {
     return await this.tokenRepository.save(token);
   }
 
-  async refresh(data: TokenEntity): Promise<TokenEntity> {
-    const { refresh_token } = data;
-
-    if (!refresh_token) {
-      throw new HttpException('Invalid data', HttpStatus.BAD_REQUEST);
-    }
-
-    const token = await this.findRefreshToken(refresh_token);
+  async refresh(data: {
+    refresh_token: TokenEntity['refresh_token'];
+  }): Promise<TokenEntity> {
+    const token = await this.findRefreshToken(data.refresh_token);
 
     if (!token) {
       throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
@@ -94,15 +90,21 @@ export class AuthService {
       throw new HttpException('Invalid user', HttpStatus.UNAUTHORIZED);
     }
 
-    const accessToken = this.jwtService.sign(user, {
+    // Creating a plain object to sign with the JWT
+    const userPayload = { ...user };
+
+    const accessToken = this.jwtService.sign(userPayload, {
       expiresIn: '3h',
       secret: process.env.JWT_SECRET,
     });
 
-    const newRefreshToken = this.jwtService.sign(user, {
+    const newRefreshToken = this.jwtService.sign(userPayload, {
       expiresIn: '7d',
       secret: process.env.JWT_SECRET,
     });
+
+    // Delete old refresh token
+    this.tokenRepository.delete({ id: token.id });
 
     return await this.saveTokens(user.id, accessToken, newRefreshToken);
   }
