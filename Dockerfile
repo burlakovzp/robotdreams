@@ -1,6 +1,6 @@
-FROM node:18
+FROM node:22-alpine
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --force
+RUN rm -rf node_modules && npm install --force
 COPY . .
-CMD ["npx", "nodemon", "index.js"]
+CMD ["npm", "run", "start:dev"]

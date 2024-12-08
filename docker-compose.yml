@@ -2,16 +2,28 @@ version: '3.8'
 services:
   db:
     image: postgres:16
-    container_name: postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: nest_app
+      POSTGRES_DB: robot_dreams
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      REDIS_HOSTS: redis
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
 
 volumes:
   postgres_data:

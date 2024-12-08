@@ -3,13 +3,16 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private readonly jwtService: JwtService, // private readonly tokensService: TokensService,
+    private readonly jwtService: JwtService,
+    private readonly authService: AuthService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -25,7 +28,7 @@ export class AuthGuard implements CanActivate {
       request.body.refresh_token || request.query.refresh_token;
 
     if (!refreshToken) {
-      throw new UnauthorizedException('Missing tokens');
+      throw new ForbiddenException('No token provided');
     }
 
     return this.validateRefreshToken(refreshToken, request);
@@ -39,11 +42,11 @@ export class AuthGuard implements CanActivate {
       const decoded = this.jwtService.verify(token, {
         secret: process.env.JWT_SECRET,
       });
-      //   const storedToken = await this.tokensService.findAccessToken(token);
+      const storedToken = await this.authService.findAccessToken(token);
 
-      //   if (!storedToken) {
-      //     throw new UnauthorizedException('Access token not found in database');
-      //   }
+      if (!storedToken) {
+        throw new UnauthorizedException('Access token not found in database');
+      }
 
       request.user = decoded;
       return true;
@@ -60,18 +63,18 @@ export class AuthGuard implements CanActivate {
       const decoded = this.jwtService.verify(token, {
         secret: process.env.JWT_SECRET,
       });
-      //   const storedToken = await this.tokensService.findRefreshToken(token);
+      const storedToken = await this.authService.findRefreshToken(token);
 
-      //   if (!storedToken) {
-      //     throw new UnauthorizedException('Refresh token not found in database');
-      //   }
+      if (!storedToken) {
+        throw new UnauthorizedException('Refresh token not found in database');
+      }
 
       const newAccessToken = this.jwtService.sign(
         { username: decoded.username, sub: decoded.sub },
         { expiresIn: '15m', secret: process.env.JWT_SECRET },
       );
 
-      //   await this.tokensService.saveTokens(decoded.sub, newAccessToken, token);
+      await this.authService.saveTokens(decoded.sub, newAccessToken, token);
 
       request.user = decoded;
       request.newAccessToken = newAccessToken;

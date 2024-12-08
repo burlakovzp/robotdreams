@@ -7,12 +7,14 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { UserEntity } from '../users/user.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('posts')
 export class PostEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiProperty({ default: 'Lorem ipsum...' })
   @Column('text')
   content: string;
 

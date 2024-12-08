@@ -6,7 +6,15 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Swagger configuration
-  const config = new DocumentBuilder().build();
+  const config = new DocumentBuilder()
+    .addBearerAuth(
+      {
+        description: `Please add access token for authorization`,
+        type: 'http',
+      },
+      'access-token',
+    )
+    .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 

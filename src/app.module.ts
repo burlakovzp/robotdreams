@@ -2,11 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UserModule } from './users/user.module';
 import { PostModule } from './posts/post.module';
-import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 
 import { UserEntity } from './users/user.entity';
@@ -21,20 +18,18 @@ import { PostEntity } from './posts/post.entity';
     ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: () => ({
         type: 'postgres',
-        host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USER'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_NAME'),
+        host: process.env.DB_HOST || 'localhost',
+        port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 5433,
+        username: process.env.DB_USER || 'postgres',
+        password: process.env.DB_PASSWORD || 'postgres',
+        database: process.env.DB_NAME || 'robot_dreams',
         entities: [UserEntity, TokenEntity, PostEntity],
         synchronize: true,
       }),
       inject: [ConfigService],
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService, AuthService],
 })
 export class AppModule {}

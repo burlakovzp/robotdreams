@@ -23,21 +23,11 @@ export class UserService {
   }
 
   async create(user: UserEntity): Promise<UserEntity> {
-    return this.usersRepository.save(user);
+    const newUser = this.usersRepository.create(user);
+    return this.usersRepository.save(newUser);
   }
 
   async findByEmail(email: string): Promise<UserEntity | undefined> {
     return this.usersRepository.findOneBy({ email });
-  }
-
-  async validateUser(
-    email: string,
-    password: string,
-  ): Promise<UserEntity | null> {
-    const user = await this.findByEmail(email);
-    if (user && (await user.comparePassword(password))) {
-      return user;
-    }
-    return null;
   }
 }

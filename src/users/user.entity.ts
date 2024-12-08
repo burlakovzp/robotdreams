@@ -6,20 +6,20 @@ import {
   OneToMany,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { PostEntity } from 'src/posts/post.entity';
-import { TokenEntity } from 'src/auth/token.entity';
+import { PostEntity } from '../posts/post.entity';
+import { TokenEntity } from '../auth/token.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('users')
 export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  name: string;
-
+  @ApiProperty({ default: 'test@gmail.com' })
   @Column()
   email: string;
 
+  @ApiProperty({ default: 'password123' })
   @Column()
   password: string;
 
@@ -30,7 +30,7 @@ export class UserEntity {
   }
 
   async comparePassword(attempt: string): Promise<boolean> {
-    return bcrypt.compare(attempt, this.password);
+    return await bcrypt.compare(attempt, this.password);
   }
 
   @OneToMany(() => PostEntity, (post) => post.user)
