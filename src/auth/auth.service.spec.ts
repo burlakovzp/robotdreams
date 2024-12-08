@@ -5,6 +5,8 @@ import { TokenEntity } from './token.entity';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../users/user.entity';
 import { PostEntity } from '../posts/post.entity';
+import { JwtService } from '@nestjs/jwt';
+import { UserService } from '../users/user.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -14,6 +16,8 @@ describe('AuthService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
+        JwtService,
+        UserService,
         {
           provide: getRepositoryToken(TokenEntity),
           useClass: Repository,
